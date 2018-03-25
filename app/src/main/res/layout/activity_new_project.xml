@@ -131,14 +131,10 @@
         android:id="@+id/sbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="76dp"
         android:layout_marginEnd="56dp"
         android:layout_marginStart="240dp"
-        android:layout_marginRight="56dp"
-        android:layout_marginLeft="240dp"
-        android:layout_marginTop="8dp"
+        android:padding="10dp"
         android:text="Upload Project"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dateview" />
@@ -180,7 +176,7 @@
         android:id="@+id/dateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="175dp"
+        android:layout_marginBottom="41dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="16dp"
@@ -189,7 +185,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/dateview"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+        app:layout_constraintTop_toBottomOf="@+id/status"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/dateview"
@@ -198,12 +195,38 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="132dp"
         android:layout_marginRight="132dp"
-        android:layout_marginStart="59dp"
         android:layout_marginLeft="59dp"
+        android:layout_marginStart="59dp"
+        android:paddingBottom="20dp"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        app:layout_constraintBaseline_toBaselineOf="@+id/dateButton"
         app:layout_constraintBottom_toBottomOf="@+id/dateButton"
+        app:layout_constraintBottom_toTopOf="@id/sbutton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dateButton"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+        app:layout_constraintStart_toEndOf="@+id/dateButton" />
+
+    <RadioGroup
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollView2">
+
+        <RadioButton
+            android:id="@+id/complete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Complete" />
+
+        <RadioButton
+            android:id="@+id/incomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Incomplete" />
+    </RadioGroup>
+
 
 </android.support.constraint.ConstraintLayout>

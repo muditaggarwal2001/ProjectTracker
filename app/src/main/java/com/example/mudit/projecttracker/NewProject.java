@@ -6,16 +6,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.io.FileOutputStream;
 import java.util.Calendar;
 
 public class NewProject extends AppCompatActivity {
+    private TextView dateview;
+    private EditText Ctitle, CNumber, IName, Pnumber, ProjectDesc;
+    private RadioGroup status;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
-
+        Ctitle = (EditText) findViewById(R.id.Ctitle);
+        CNumber = (EditText) findViewById(R.id.CNumber);
+        IName = (EditText) findViewById(R.id.Iname);
+        Pnumber = (EditText) findViewById(R.id.Pnumber);
+        ProjectDesc = (EditText) findViewById(R.id.project_desc);
+        status = (RadioGroup) findViewById(R.id.status);
         Button dateButton = (Button) findViewById(R.id.dateButton);
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -27,13 +40,23 @@ public class NewProject extends AppCompatActivity {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(NewProject.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                        TextView dateview = (TextView) findViewById(R.id.dateview);
+                        dateview = (TextView) findViewById(R.id.dateview);
                         dateview.setText(selectedday+"/"+selectedmonth+"/"+selectedyear);
                     }
                 },year,month,day);
+                datePickerDialog.show();
             }
         });
         uploadproject();
+    }
+
+    private String fetchProjectdata()
+    {
+        String result="";
+        result+=Ctitle.getText()+";"+CNumber.getText()+";"+IName.getText()+";"+Pnumber.getText()+";"+ProjectDesc.getText()+";"+dateview.getText()+";";
+        RadioButton rb=(RadioButton)findViewById(status.getCheckedRadioButtonId());
+        result+=rb.getTag();
+        return result;
     }
 
     private void uploadproject() {
@@ -41,7 +64,18 @@ public class NewProject extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                String data = fetchProjectdata();
+                FileOutputStream outputStream;
+                try{
+                    Long x = System.currentTimeMillis()/1000;
+                    outputStream = openFileOutput(x.toString()+".txt",MODE_PRIVATE);   //creats file in directory context.getFirlesDir()
+                    outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
+                    outputStream.close();
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                finish();
             }
         });
     }
