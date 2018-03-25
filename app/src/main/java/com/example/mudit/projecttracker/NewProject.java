@@ -1,8 +1,10 @@
 package com.example.mudit.projecttracker;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -10,7 +12,14 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Calendar;
 
@@ -18,11 +27,13 @@ public class NewProject extends AppCompatActivity {
     private TextView dateview;
     private EditText Ctitle, CNumber, IName, Pnumber, ProjectDesc;
     private RadioGroup status;
-
+    private awsManager manager;
+    private int editint;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
+        manager = new awsManager(getApplicationContext());
         Ctitle = (EditText) findViewById(R.id.Ctitle);
         CNumber = (EditText) findViewById(R.id.CNumber);
         IName = (EditText) findViewById(R.id.Iname);
@@ -30,6 +41,7 @@ public class NewProject extends AppCompatActivity {
         ProjectDesc = (EditText) findViewById(R.id.project_desc);
         status = (RadioGroup) findViewById(R.id.status);
         Button dateButton = (Button) findViewById(R.id.dateButton);
+        
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,11 +71,38 @@ public class NewProject extends AppCompatActivity {
         return result;
     }
 
+    private void uploadfile(File file)
+    {
+        TransferUtility transferUtility = manager.getTransferUtility();
+        TransferObserver transferObserver = transferUtility.upload(Utils.bucket,file.getName(),file);
+        transferObserverListener(transferObserver);
+    }
+
+    public void transferObserverListener(TransferObserver transferObserver) {
+        transferObserver.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                Toast.makeText(getApplicationContext(), "State Change" + state,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                Log.d("Progress","Progress is "+((bytesCurrent/bytesTotal)*100)+"%");
+            }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                Log.e("error","Error while transfering");
+            }
+        });
+    }
+
     private void uploadproject() {
         Button submit = (Button)findViewById(R.id.sbutton);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String data = fetchProjectdata();
                 FileOutputStream outputStream;
                 try{

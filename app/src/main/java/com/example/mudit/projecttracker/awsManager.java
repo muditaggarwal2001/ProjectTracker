@@ -15,9 +15,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 
 public class awsManager {
 
-    AmazonS3 amazonS3client;
-    TransferUtility transferUtility;
-    String bucket = "projecttracker1";
+    private AmazonS3 amazonS3client;
+    private TransferUtility transferUtility;
     Context context;
 
     public awsManager(Context c)
@@ -49,6 +48,7 @@ public class awsManager {
         amazonS3client.setRegion(Region.getRegion(Regions.US_EAST_1));
     }
 
-    
-
+    public TransferUtility getTransferUtility() {
+        return transferUtility;
+    }
 }
