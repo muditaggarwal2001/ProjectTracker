@@ -142,7 +142,8 @@ public class NewProject extends AppCompatActivity {
                         outputStream =  new FileOutputStream(file,false);
                         outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
                         outputStream.close();
-
+                        manager.deleteFile(file);   //deleting from aws s3, file passed for intention of providing it's key with which it was saved
+                        uploadfile(file);   //uploading modified file with same name
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (UnsupportedEncodingException e) {

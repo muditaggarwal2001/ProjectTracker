@@ -12,14 +12,22 @@ public class fileContentmanager {
     private String Ctitle, CNumber, IName, Pnumber, ProjectDesc,dateview, status;
 
     public fileContentmanager(File file){
-        byte[] bytes ;
+        byte[] bytes,temp1 ;
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
-            int x = fileInputStream.available();
-            bytes = new byte[x];
-            fileInputStream.read(bytes);
+            int size = (int)file.length();
+            bytes = new byte[size];
+            temp1= new byte[size];
+            int read =fileInputStream.read(bytes,0,size);
+            int remain=size-read;
+            while (remain>0)
+            {
+                read=fileInputStream.read(temp1,0,remain);
+                System.arraycopy(temp1,0,bytes,size-remain,read);
+                remain-=read;
+            }
             fileInputStream.close();
-            String temp = Arrays.toString(bytes);
+            String temp = new String(bytes,"UTF-8");
             String text[]=temp.split(";");
             Ctitle=text[0];
             CNumber=text[1];
