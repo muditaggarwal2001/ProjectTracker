@@ -9,6 +9,8 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 
+import java.io.File;
+
 /**
  * Created by Mudit on 24-03-2018.
  */
@@ -46,6 +48,10 @@ public class awsManager {
     private void createAmazonS3Client(CognitoCachingCredentialsProvider credentialsProvider) {
         amazonS3client = new AmazonS3Client(credentialsProvider);
         amazonS3client.setRegion(Region.getRegion(Regions.US_EAST_1));
+    }
+
+    public void deleteFile(File file){
+        amazonS3client.deleteObject(Utils.bucket,file.getName());
     }
 
     public TransferUtility getTransferUtility() {
