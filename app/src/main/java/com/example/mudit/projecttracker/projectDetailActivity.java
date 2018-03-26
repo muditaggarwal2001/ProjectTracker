@@ -18,20 +18,22 @@ import android.view.MenuItem;
  * in a {@link projectListActivity}.
  */
 public class projectDetailActivity extends AppCompatActivity {
-
+    private String positionno;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
+        positionno=getIntent().getStringExtra(projectDetailFragment.ARG_ITEM_ID);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(projectDetailActivity.this, NewProject.class);
+                intent.putExtra(projectDetailFragment.ARG_ITEM_ID, positionno);
+                startActivity(intent);
+                finish();
             }
         });
 

@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.mudit.projecttracker.dummy.DummyContent;
+import java.io.File;
 
 /**
  * A fragment representing a single project detail screen.
@@ -27,8 +27,8 @@ public class projectDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
-
+    private File mItem;
+    private fileContentmanager contentmanager;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -44,12 +44,14 @@ public class projectDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mItem = Utils.ITEMS.get(Integer.parseInt(getArguments().getString(ARG_ITEM_ID)));
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            contentmanager = new fileContentmanager(mItem);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+
+                appBarLayout.setTitle("Project: "+contentmanager.getPnumber());
             }
         }
     }
@@ -61,7 +63,7 @@ public class projectDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.project_detail)).setText(mItem.details);
+            ((TextView) rootView.findViewById(R.id.project_detail)).setText(contentmanager.getSummary());
         }
 
         return rootView;

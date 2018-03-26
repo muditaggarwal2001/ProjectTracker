@@ -28,7 +28,7 @@ public class NewProject extends AppCompatActivity {
     private EditText Ctitle, CNumber, IName, Pnumber, ProjectDesc;
     private RadioGroup status;
     private awsManager manager;
-    private int editint;
+    private int editint=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +41,21 @@ public class NewProject extends AppCompatActivity {
         ProjectDesc = (EditText) findViewById(R.id.project_desc);
         status = (RadioGroup) findViewById(R.id.status);
         Button dateButton = (Button) findViewById(R.id.dateButton);
-        
+        if(getIntent().hasExtra(projectDetailFragment.ARG_ITEM_ID))
+        {
+            editint = Integer.parseInt(getIntent().getStringExtra(projectDetailFragment.ARG_ITEM_ID));
+            fileContentmanager contentmanager = new fileContentmanager(Utils.ITEMS.get(editint));
+            Ctitle.setText(contentmanager.getCtitle());
+            CNumber.setText(contentmanager.getCNumber());
+            IName.setText(contentmanager.getIName());
+            Pnumber.setText(contentmanager.getPnumber());
+            ProjectDesc.setText(contentmanager.getProjectDesc());
+            if(contentmanager.getStatus().equalsIgnoreCase("Complete"))
+                status.check(R.id.complete);
+            else
+                status.check(R.id.incomplete);
+        }
+
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,6 +92,8 @@ public class NewProject extends AppCompatActivity {
         transferObserverListener(transferObserver);
     }
 
+
+
     public void transferObserverListener(TransferObserver transferObserver) {
         transferObserver.setTransferListener(new TransferListener() {
             @Override
@@ -92,7 +108,7 @@ public class NewProject extends AppCompatActivity {
 
             @Override
             public void onError(int id, Exception ex) {
-                Log.e("error","Error while transfering");
+                Log.e("error","Error while transferring");
             }
         });
     }
@@ -107,7 +123,7 @@ public class NewProject extends AppCompatActivity {
                 FileOutputStream outputStream;
                 try{
                     Long x = System.currentTimeMillis()/1000;
-                    outputStream = openFileOutput(x.toString()+".txt",MODE_PRIVATE);   //creats file in directory context.getFirlesDir()
+                    outputStream = openFileOutput(x.toString()+".txt",MODE_PRIVATE);   //creats file in directory context.getFilesDir()
                     outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
                     outputStream.close();
                 }catch (Exception e)

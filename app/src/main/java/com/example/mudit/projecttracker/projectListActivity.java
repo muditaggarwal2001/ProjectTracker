@@ -14,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-import com.example.mudit.projecttracker.dummy.DummyContent;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,7 +39,6 @@ public class projectListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_list);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -48,8 +47,7 @@ public class projectListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(projectListActivity.this,NewProject.class));
             }
         });
 
@@ -60,6 +58,18 @@ public class projectListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        File[] files = getApplicationContext().getFilesDir().listFiles();
+        if (files!=null) {
+            Utils.ITEMS = Arrays.asList(files);
+        }
+        else {
+            Utils.ITEMS = new ArrayList<File>();
+        }
 
         View recyclerView = findViewById(R.id.project_list);
         assert recyclerView != null;
@@ -67,22 +77,22 @@ public class projectListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, Utils.ITEMS, mTwoPane));
     }
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final projectListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<File> mValues;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                int item = (int) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(projectDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putString(projectDetailFragment.ARG_ITEM_ID, String.valueOf(item));
                     projectDetailFragment fragment = new projectDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -91,15 +101,14 @@ public class projectListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, projectDetailActivity.class);
-                    intent.putExtra(projectDetailFragment.ARG_ITEM_ID, item.id);
-
+                    intent.putExtra(projectDetailFragment.ARG_ITEM_ID, String.valueOf(item));
                     context.startActivity(intent);
                 }
             }
         };
 
         SimpleItemRecyclerViewAdapter(projectListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      List<File> items,
                                       boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
@@ -115,10 +124,11 @@ public class projectListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            fileContentmanager contentmanager = new fileContentmanager(mValues.get(position));
+            holder.mIdView.setText("Project: "+contentmanager.getPnumber());
+            holder.mContentView.setText(contentmanager.getStatus());
 
-            holder.itemView.setTag(mValues.get(position));
+            holder.itemView.setTag(position);
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
