@@ -20,7 +20,10 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
 public class NewProject extends AppCompatActivity {
@@ -28,7 +31,8 @@ public class NewProject extends AppCompatActivity {
     private EditText Ctitle, CNumber, IName, Pnumber, ProjectDesc;
     private RadioGroup status;
     private awsManager manager;
-    private int editint=0;
+    private int editint=-1;
+    File file;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,17 +122,35 @@ public class NewProject extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String data = fetchProjectdata();
                 FileOutputStream outputStream;
-                try{
-                    Long x = System.currentTimeMillis()/1000;
-                    outputStream = openFileOutput(x.toString()+".txt",MODE_PRIVATE);   //creats file in directory context.getFilesDir()
-                    outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
-                    outputStream.close();
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
+                if(editint==-1) {
+                    try {
+                        Long x = System.currentTimeMillis() / 1000;
+                        outputStream = openFileOutput(x.toString() + ".txt", MODE_PRIVATE);   //creats file in directory context.getFilesDir()
+                        outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
+                        outputStream.close();
+                        file = new File(getApplicationContext().getFilesDir().getPath()+"/"+x.toString() + ".txt");
+                        uploadfile(file);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    file=Utils.ITEMS.get(editint);
+                    try {
+                        outputStream =  new FileOutputStream(file,false);
+                        outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
+                        outputStream.close();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
                 finish();
             }
