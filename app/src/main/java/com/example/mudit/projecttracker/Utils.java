@@ -8,6 +8,7 @@ import java.util.List;
  */
 
 public class Utils {
-    public static final String bucket = "projecttracker1";
+    public static final String bucket = "projecttracker2";
     public static List<File> ITEMS;
+    public static awsManager manager;
 }
