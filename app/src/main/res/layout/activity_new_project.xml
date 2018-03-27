@@ -218,6 +218,8 @@
             android:id="@+id/complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checked="false"
+            android:tag="Complete"
             android:text="Complete" />
 
         <RadioButton
@@ -225,6 +227,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
+            android:tag="Incomplete"
             android:text="Incomplete" />
     </RadioGroup>
 

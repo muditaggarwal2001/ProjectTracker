@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.io.File;
 
 /**
  * An activity representing a single project detail screen. This
@@ -67,6 +71,12 @@ public class projectDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.project_desc_menu,menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -78,6 +88,18 @@ public class projectDetailActivity extends AppCompatActivity {
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
             NavUtils.navigateUpTo(this, new Intent(this, projectListActivity.class));
+            return true;
+        }
+        else if(id==R.id.delete)
+        {
+            int i = Integer.parseInt(positionno);
+            File file=Utils.ITEMS.get(i);
+            Utils.manager.deleteFile(file);
+            if(file.delete())
+                Utils.ITEMS.remove(i);
+            else
+                Toast.makeText(getApplicationContext(),"File Deletion error", Toast.LENGTH_LONG).show();
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

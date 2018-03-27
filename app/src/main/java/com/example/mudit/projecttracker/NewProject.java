@@ -30,14 +30,15 @@ public class NewProject extends AppCompatActivity {
     private TextView dateview;
     private EditText Ctitle, CNumber, IName, Pnumber, ProjectDesc;
     private RadioGroup status;
-    private awsManager manager;
+
     private int editint=-1;
     File file;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
-        manager = new awsManager(getApplicationContext());
+        if(Utils.manager==null)
+            Utils.manager = new awsManager(getApplicationContext());
         Ctitle = (EditText) findViewById(R.id.Ctitle);
         CNumber = (EditText) findViewById(R.id.CNumber);
         IName = (EditText) findViewById(R.id.Iname);
@@ -54,6 +55,7 @@ public class NewProject extends AppCompatActivity {
             IName.setText(contentmanager.getIName());
             Pnumber.setText(contentmanager.getPnumber());
             ProjectDesc.setText(contentmanager.getProjectDesc());
+            dateview.setText(contentmanager.getDateview());
             if(contentmanager.getStatus().equalsIgnoreCase("Complete"))
                 status.check(R.id.complete);
             else
@@ -91,7 +93,7 @@ public class NewProject extends AppCompatActivity {
 
     private void uploadfile(File file)
     {
-        TransferUtility transferUtility = manager.getTransferUtility();
+        TransferUtility transferUtility = Utils.manager.getTransferUtility();
         TransferObserver transferObserver = transferUtility.upload(Utils.bucket,file.getName(),file);
         transferObserverListener(transferObserver);
     }
@@ -112,7 +114,7 @@ public class NewProject extends AppCompatActivity {
 
             @Override
             public void onError(int id, Exception ex) {
-                Log.e("error","Error while transferring");
+                Log.d("error","Error while transferring");
             }
         });
     }
@@ -142,7 +144,7 @@ public class NewProject extends AppCompatActivity {
                         outputStream =  new FileOutputStream(file,false);
                         outputStream.write(data.getBytes("UTF-8")); //revert back using Arrays.tostring(bytes)
                         outputStream.close();
-                        manager.deleteFile(file);   //deleting from aws s3, file passed for intention of providing it's key with which it was saved
+                        Utils.manager.deleteFile(file);   //deleting from aws s3, file passed for intention of providing it's key with which it was saved
                         uploadfile(file);   //uploading modified file with same name
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
