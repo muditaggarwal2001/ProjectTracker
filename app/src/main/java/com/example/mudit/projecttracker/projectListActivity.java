@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import java.io.File;
@@ -21,8 +23,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * An activity representing a list of projects. This activity
@@ -39,19 +43,23 @@ public class projectListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
-    private static String incproj="";
-    private boolean launch = true;
+    private static String incproj;
+    private boolean launch;
     static Date currentDate;
     static SimpleDateFormat sdf;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("In Oncreate");
+        incproj="";
+        launch=true;
         setContentView(R.layout.activity_project_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         sdf = new SimpleDateFormat("dd/MM/yyyy");
-        currentDate = new Date();
+        sdf.setTimeZone(TimeZone.getDefault());
+        currentDate = Calendar.getInstance().getTime();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,9 +77,8 @@ public class projectListActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    void fillList()
+    {
         File[] files = getApplicationContext().getFilesDir().listFiles();
         if (files!=null) {
             Utils.ITEMS = Arrays.asList(files);
@@ -79,18 +86,33 @@ public class projectListActivity extends AppCompatActivity {
         else {
             Utils.ITEMS = new ArrayList<File>();
         }
-        View recyclerView = findViewById(R.id.project_list);
+        final View recyclerView = findViewById(R.id.project_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
-        if(launch==true&&!incproj.isEmpty())
-        {
-            launch=false;
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Projects due in 2 Days:");
-            builder.setMessage(incproj);
-            builder.setPositiveButton("OK",null);
-            builder.create().show();
-        }
+        final View view=findViewById(R.id.colayout);
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!incproj.isEmpty()&&launch==true){
+                final Snackbar snackbar = Snackbar.make(view,"Projects due in 2 Days:\n"+incproj,Snackbar.LENGTH_INDEFINITE);
+                    launch=false;
+                    incproj="";
+                    snackbar.setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        snackbar.dismiss();
+                    }
+                });
+                snackbar.show();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fillList();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -107,20 +129,11 @@ public class projectListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int item = (int) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(projectDetailFragment.ARG_ITEM_ID, String.valueOf(item));
-                    projectDetailFragment fragment = new projectDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.project_detail_container, fragment)
-                            .commit();
-                } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, projectDetailActivity.class);
                     intent.putExtra(projectDetailFragment.ARG_ITEM_ID, String.valueOf(item));
                     context.startActivity(intent);
-                }
+
             }
         };
 
@@ -145,12 +158,15 @@ public class projectListActivity extends AppCompatActivity {
             holder.mIdView.setText("Project: "+contentmanager.getPnumber());
             holder.mContentView.setText(contentmanager.getStatus());
             try {
-                Long difference=currentDate.getTime()-sdf.parse(contentmanager.getDateview()).getTime();
-                Long days=difference/86400000;
-                if(days<2&&days>=0)
+                Long difference;
+                difference = sdf.parse(contentmanager.getDateview()).getTime()-sdf.parse(sdf.format(currentDate)).getTime();
+                Long days=difference/86400000; //divided by no. of milliseconds in a day to get no. of days.
+                if(days<2&&contentmanager.getStatus().equalsIgnoreCase("Incomplete"))
                 {
                    incproj+="Project: "+contentmanager.getPnumber()+"\n";
                 }
+                System.out.println("Printing incomplete project:");
+                System.out.println(incproj);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -73,7 +73,7 @@ public class NewProject extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
                         dateview = (TextView) findViewById(R.id.dateview);
-                        dateview.setText(selectedday+"/"+selectedmonth+"/"+selectedyear);
+                        dateview.setText(selectedday+"/"+(selectedmonth+1)+"/"+selectedyear);
                     }
                 },year,month,day);
                 datePickerDialog.show();
