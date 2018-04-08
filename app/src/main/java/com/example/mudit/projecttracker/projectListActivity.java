@@ -50,7 +50,8 @@ public class projectListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("In Oncreate");
+        Intent musicService = new Intent(getApplicationContext(),MusicPlayer.class);
+        startService(musicService);
         incproj="";
         launch=true;
         setContentView(R.layout.activity_project_list);
