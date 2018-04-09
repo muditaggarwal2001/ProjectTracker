@@ -28,6 +28,7 @@ public class fileContentmanager {
             }
             fileInputStream.close();
             String temp = new String(bytes,"UTF-8");
+            System.out.println(temp);
             String text[]=temp.split(";");
             Ctitle=text[0];
             CNumber=text[1];

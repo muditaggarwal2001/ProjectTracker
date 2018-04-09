@@ -45,6 +45,7 @@ public class NewProject extends AppCompatActivity {
         Pnumber = (EditText) findViewById(R.id.Pnumber);
         ProjectDesc = (EditText) findViewById(R.id.project_desc);
         status = (RadioGroup) findViewById(R.id.status);
+        dateview = (TextView) findViewById(R.id.dateview);
         Button dateButton = (Button) findViewById(R.id.dateButton);
         if(getIntent().hasExtra(projectDetailFragment.ARG_ITEM_ID))
         {
@@ -72,7 +73,6 @@ public class NewProject extends AppCompatActivity {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(NewProject.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                        dateview = (TextView) findViewById(R.id.dateview);
                         dateview.setText(selectedday+"/"+(selectedmonth+1)+"/"+selectedyear);
                     }
                 },year,month,day);
